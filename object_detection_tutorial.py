@@ -22,6 +22,7 @@ from collections import defaultdict
 from io import StringIO
 from matplotlib import pyplot as plt
 from PIL import Image
+import time
 
 # This is needed since the notebook is stored in the object_detection folder.
 sys.path.append("..")
@@ -37,7 +38,7 @@ if StrictVersion(tf.__version__) < StrictVersion('1.9.0'):
 
 
 # This is needed to display the images.
-get_ipython().run_line_magic('matplotlib', 'inline')
+#get_ipython().run_line_magic('matplotlib', 'inline')
 
 
 # ## Object detection imports
@@ -51,12 +52,12 @@ from utils import label_map_util
 from utils import visualization_utils as vis_util
 
 
-# # Model preparation 
+# # Model preparation
 
 # ## Variables
-# 
-# Any model exported using the `export_inference_graph.py` tool can be loaded here simply by changing `PATH_TO_FROZEN_GRAPH` to point to a new .pb file.  
-# 
+#
+# Any model exported using the `export_inference_graph.py` tool can be loaded here simply by changing `PATH_TO_FROZEN_GRAPH` to point to a new .pb file.
+#
 # By default we use an "SSD with Mobilenet" model here. See the [detection model zoo](https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc/detection_model_zoo.md) for a list of other models that can be run out-of-the-box with varying speeds and accuracies.
 
 # In[4]:
@@ -174,8 +175,11 @@ def run_inference_for_single_image(image, graph):
       image_tensor = tf.get_default_graph().get_tensor_by_name('image_tensor:0')
 
       # Run inference
+      start_time = time.time()
       output_dict = sess.run(tensor_dict,
                              feed_dict={image_tensor: np.expand_dims(image, 0)})
+      end_time = time.time()
+      print("run time:", end_time - start_time)
 
       # all outputs are float32 numpy arrays, so convert types as appropriate
       output_dict['num_detections'] = int(output_dict['num_detections'][0])
@@ -186,7 +190,6 @@ def run_inference_for_single_image(image, graph):
       if 'detection_masks' in output_dict:
         output_dict['detection_masks'] = output_dict['detection_masks'][0]
   return output_dict
-
 
 # In[11]:
 
@@ -212,24 +215,8 @@ for image_path in TEST_IMAGE_PATHS:
       line_thickness=8)
   plt.figure(figsize=IMAGE_SIZE)
   plt.imshow(image_np)
-    
+
   print("finish!")
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
+  plt.title('image')
+  plt.show()
 
